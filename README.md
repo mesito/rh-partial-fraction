@@ -44,7 +44,7 @@ All computations use `mpmath.mp.dps = 25` (25 significant decimal digits).
 | `verify_06_*` | 17.6 | Tunneling Mh₀ = πs/√Cₙ, Cₙ statistics (Theorem 15.1) |
 | `verify_07_*` | 17.7 | Self-consistency h₀²·S_on = 2 to machine precision |
 | `verify_08_*` | 17.8 | Speiser depth scaling, √δ law (Theorem 13.1) |
-| `verify_09_*` | 17.9 | Collision-time ODE, universal η ≈ 0.459 (Theorem 16.1) |
+| `verify_09_*` | 17.9 | Collision-time ODE, universal η ≈ 0.456 (Theorem 16.1) |
 | `verify_10_*` | 18–27 | Gram tensor E(T), budget B(T), E/B → ∞ (Theorem 21.2) |
 | `run_all.py` | — | Master runner |
 
@@ -60,7 +60,7 @@ All computations use `mpmath.mp.dps = 25` (25 significant decimal digits).
 | h₀² · S_on | 2.0000000000 ± 0 ✓ | 2.000000 ± 10⁻¹⁴ |
 | Mh₀/s | 2.80 ± 0.19 ✓ | 2.80 ± 0.20 |
 | Speiser C̄ | 1.18 ± 0.05 | 1.18 ± 0.05 |
-| η (collision) | 0.459 ± 0.003 | 0.459 ± 0.003 |
+| η (collision) | 0.456 ± 0.002 | 0.456 ± 0.002 |
 | E/B | grows as log⁵ T ✓ | Theorem 21.2 |
 | **Λ (unconditional)** | **≤ 0.200** ✓ | **≤ 0.200** |
 
@@ -87,6 +87,10 @@ At the self-consistent depth h₀ = √(2/S_on), no Speiser companion exists.
 For h₀ > h_thr, a companion appears at depth h' ≈ C̄√(δ · h_thr) with
 C̄ ≈ 1.18 ± 0.05 (square-root scaling, exponent α ≈ 0.51).
 
+Note: gaps with large Lₙ (e.g., gap 1 with L₁ ≈ 6.89) have h_thr > ½,
+so the Speiser companion cannot exist within the critical strip regardless
+of h₀. The scaling law is verified on gaps with h_thr < ½ (e.g., gap 600).
+
 ### Structural inequality E/B → ∞ (Theorem 21.2)
 
 The Speiser-free bound E/B ≥ π log³ T / 2 holds at all depths including
@@ -102,7 +106,9 @@ self-consistency, and is independent of the Speiser scaling constant.
 | Remark 5.4 (Cₙ range) | Cₙ ≥ 10.3 | **Cₙ ∈ [1.002, 2.306]**, mean 1.29 | Cn_min = 1.002, not ≥ 6.95 |
 | Λ ≤ 0.047 conditional | Conditional on Cₙ ≥ 6.95 | **Removed** — condition not satisfied | Only Λ ≤ 0.200 unconditional remains |
 | Λ ≤ 0.021 conditional | Conditional on η numerical | **Removed** | Only Λ ≤ 0.200 unconditional remains |
-| Gap-by-gap η table | S_on values from Lemma 13.2 | S_on from full 2000-zero computation | η ≈ 0.459 unchanged |
+| η collision-time ratio | η = 0.459 ± 0.003 | **η = 0.456 ± 0.002** (300 nearby zeros per gap) | Numerical observation; Λ bound uses η₂ = 0.615 (analytical) |
+| Speiser Step 4 verification | Gap 1 (S_on = 3.09, h_thr = 0.805) | **Gap 600** (S_on = 20.998, h_thr = 0.309) | Gap 1 has h_thr > ½, cannot test Speiser in critical strip |
+| Gap-by-gap η table | S_on values from Lemma 13.2 | S_on from full 2000-zero computation | η ≈ 0.456 unchanged |
 
 ## Three-layer structure
 
@@ -114,7 +120,7 @@ The paper is organized into three layers with explicit logical status:
 
 - **Layer B (numerical observations):** Gram tensor, collision-time universality,
   Speiser scaling. Structural inequality E/B → ∞ is rigorous; numerical constants
-  (η = 0.459, C̄ = 1.18) are observations supported by 25-digit computation.
+  (η = 0.456, C̄ = 1.18) are observations supported by 25-digit computation.
 
 - **Layer C (conjectural):** Arithmetic Non-Realizability principle. Reformulates the
   obstruction at the prime side via Euler realizability, motivated by the Blaschke

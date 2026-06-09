@@ -49,12 +49,9 @@ def verify_statistical_balance(zeros, verbose=True):
 
         needed = A * n0_T / h0**2
 
-        # Typical sigma ~ sqrt(C/h0^2) ~ C'/h0
-        # From Selberg CLT: variance ~ (1/2) * log(log(T)) for log|zeta|
-        # For zeta'/zeta: sigma ~ C/h0 with C ~ 1
-        typical_sigma = 1.0 / h0 * mpmath.sqrt(0.5 * mpmath.log(logT))
-        # Simpler: paper uses typical_sigma values directly
-        # Let's compute the ratio
+        # Typical sigma from Selberg CLT: variance ~ (1/2) log log T for log|zeta|.
+        # (v14 Table 2 convention: typical_sigma = sqrt(0.5 * log log T), no 1/h0 factor.)
+        typical_sigma = mpmath.sqrt(0.5 * mpmath.log(logT))
         sigma_equiv = needed / float(typical_sigma)
 
         results.append((T, float(needed), float(typical_sigma), sigma_equiv))

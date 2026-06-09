@@ -4,7 +4,7 @@ Mh0 = pi * s_n / sqrt(C_n) is T-independent.
 
 Paper: Mh0/s = 2.80 +/- 0.20, consistent with pi/sqrt(Cn) = 2.78.
 Min Mh0 = 0.98 at gap 1880.
-Cn in [1.001, 2.306], mean 1.28, std 0.16.
+Cn in [1.002, 2.306], mean 1.29, std 0.20.
 """
 
 import mpmath
@@ -115,7 +115,7 @@ def verify_tunneling(zeros, n_gaps=None, verbose=True):
         print(f"  Mean: {ratio_mean:.2f} +/- {ratio_std:.2f}")
         print(f"  Predicted pi/sqrt(Cn_mean) = {math.pi / math.sqrt(Cn_mean):.2f}")
 
-        print(f"\nPaper reference: Mh0/s = 2.80 +/- 0.20; Cn in [1.001, 2.306], mean 1.28")
+        print(f"\nPaper reference: Mh0/s = 2.80 +/- 0.20; Cn in [1.002, 2.306], mean 1.29")
 
     return {
         "Cn_range": (min(Cn_values), max(Cn_values)),

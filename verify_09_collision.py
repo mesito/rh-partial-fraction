@@ -1,9 +1,10 @@
 """
-Section 17.9: Collision Time (Theorem 16.1) -- FULL-ODE universal ratio.
+Section 17.9: Collision Time -- FULL-ODE approximate ratio (Layer B).
 
 LAYER B (numerical observation). This computes the FULL backward-flow
-collision-time ratio eta = tau_ODE / (h0^2/2) using all nearby on-line zeros.
-The observed universality eta ~ 0.456-0.459 is a numerical observation.
+collision-time ratio eta = tau_ODE / (h0^2/2) using nearby on-line zeros.
+The ratio is approximately stable, eta ~ 0.458 with per-gap CV ~ 2.7%
+across the tested gaps -- NOT a universal constant.
 
 IMPORTANT: This Layer-B full-ODE eta is DISTINCT from, and NOT used by, the
 unconditional bound Lambda <= 0.081.  That bound (Layer A) uses the rigorous
@@ -15,7 +16,7 @@ The collision time is computed via numerical quadrature:
   tau = integral_0^{h0} h / (1 + 2*h^2 * P_on(h, t0)) dh
 where P_on(h, t0) = Sum_j 1/((t0 - gamma_j)^2 + h^2).
 
-Paper: eta is independent of Son, s, T (correlations |r| < 0.02).
+eta depends weakly on gap structure: corr(eta,s) ~ -0.96, corr(eta,Son) ~ +0.42, corr(eta,T) ~ 0.00.
 """
 
 import math
@@ -129,8 +130,8 @@ def verify_collision_time(zeros, n_gaps=50, verbose=True):
                 print(f"Correlation eta vs s:   r = {corr(eta_values, s_values):+.3f}")
                 print(f"Correlation eta vs T:   r = {corr(eta_values, t_vals):+.3f}")
 
-        print(f"\nPaper reference: eta = 0.4590 +/- 0.0033 (CV = 0.71%)")
-        print(f"  (Our slightly higher CV is expected with 200 vs 2000 zeros)")
+        print(f"\nPaper reference: eta ~ 0.458, CV ~ 2.7% (approximately stable, Layer B)")
+        print(f"  (weak gap-structure dependence: corr(eta,s) ~ -0.96, corr(eta,Son) ~ +0.42)")
 
     return {
         "eta_mean": statistics.mean(eta_values) if eta_values else 0,

@@ -1,15 +1,14 @@
 """
-Section 17.8: Speiser Depth Scaling (Theorem 13.1)
+Speiser depth scaling.
 
 At self-consistency (h0 = h_thr = sqrt(2/S_on)), no Speiser zero exists
 on the horizontal segment. For h0 > h_thr:
-  h' = C * sqrt(delta * h_thr), C ~ 1.18 (v13).
+  h' = C * sqrt(delta * h_thr), C ~ 1.18.
 
 The Speiser zero is where Re[xi'/xi + hypothetical_pole] = 0.
 The hypothetical pole: 1/(h'-h0) + 1/(h'+h0) = 2h'/(h'^2 - h0^2).
 
-v13 correction: threshold uses h_thr = sqrt(2/S_on) directly,
-without the Caster drift correction (S_eff) from v11.
+The threshold uses h_thr = sqrt(2/S_on) directly.
 """
 
 import mpmath
@@ -123,8 +122,8 @@ def verify_speiser(zeros, test_gaps=None, verbose=True):
         if C_all:
             print(f"\n  C = {statistics.mean(C_all):.3f} +/- {statistics.stdev(C_all):.3f}")
 
-        print(f"\n  Paper reference (v13): C = 1.18 +/- 0.05")
-        print(f"  Note: v13 uses h_thr = sqrt(2/S_on) directly (no Caster correction).")
+        print(f"\n  Paper reference: C = 1.18 +/- 0.05")
+        print(f"  Note: threshold uses h_thr = sqrt(2/S_on) directly.")
 
     return results
 

@@ -106,15 +106,16 @@ def verify_energy_budget(verbose=True):
             x = a + i * dx
             total += (4 if i % 2 else 2) * integrand(x)
         tau2 = total * dx / 3.0
-        eta2_implied = tau2 / (0.5**2 / 2.0)
+        eta2_at_Cn1 = 0.487  # ratio tau2/(h0^2/2) at the self-consistent depth h0=L_n/2 (C_n=1)
 
         print(f"  Critical-strip depth ceiling (unconditional): h0 < 1/2")
         print(f"  Max gap at T0=3e12 (Trudgian): L_max = {Lmax}")
         print(f"  Rigorous two-zero integral at h0=1/2, L_n=L_max:")
         print(f"    Lambda <= tau_2(1/2, {Lmax}) = {tau2:.4f}  ->  Lambda <= 0.081")
-        print(f"    (implied two-zero ratio eta_2 = {eta2_implied:.4f}; Layer A, rigorous)")
+        print(f"    (Lambda is the integral value at (h0,L_n)=(1/2,L_max), Layer A, rigorous;")
+        print(f"     the dimensionless ratio eta_2 = {eta2_at_Cn1} refers to C_n=1 and is not used here.)")
         print(f"  This does NOT use the self-consistency depth (0.807) and does NOT")
-        print(f"  use the numerical full-ODE eta = 0.459 (Layer B).")
+        print(f"  use the numerical full-ODE eta ~ 0.46 (Layer B, approximately stable).")
 
     return {"ratios": ratios, "c0": c0}
 

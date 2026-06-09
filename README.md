@@ -27,8 +27,9 @@ particle under the **de Bruijn–Newman backward heat flow**
   **unconditional bound Λ ≤ 0.081** on the de Bruijn–Newman constant.
 - **Layer B (numerical observations).** The 5×5 Gram (constraint metric)
   tensor Gᵢⱼ and the structural divergence E(T)/B(T) → ∞ (the divergence
-  itself is rigorous); plus the numerically observed *full-ODE* universal
-  collision-time ratio η = 0.456 ± 0.002, the square-root Speiser scaling, and
+  itself is rigorous); plus the numerically observed *full-ODE*
+  collision-time ratio η ≈ 0.46 (approximately stable, CV ≈ 2.7%, with a weak
+  gap-structure dependence), the square-root Speiser scaling, and
   Cₙ ∈ [1.002, 2.306].
 - **Layer C (conjectural).** A reformulation of the prime-side obstruction.
 
@@ -43,28 +44,28 @@ particle under the **de Bruijn–Newman backward heat flow**
 
 ---
 
-## What changed in this revision
+## Self-consistency: definition and curvature dichotomy
 
-This revision corrects an error in the previous "self-consistency upper bound"
-statement (formerly Theorem 5.3). In the regime f″(0) ≥ 0 the self-consistency
-relation yields a **lower** bound on h₀, not an upper bound, so a *universal*
-self-consistency upper bound does **not** hold. Accordingly:
+The self-consistency relation does not yield a *universal* upper bound on h₀:
+in the regime f″(0) ≥ 0 it gives a **lower** bound, not an upper bound. The
+self-consistent depth h_thr = sqrt(2/S_on) is therefore stated as a definition
+(the marginal-stability level set f″(0) = 0), with a curvature dichotomy:
 
-- The former "self-consistency upper bound" theorem is replaced by
+- The self-consistency structure consists of
   - a **Definition** of the self-consistent depth
     `h_thr := sqrt(2 / S_on)` (equivalently the level set {f″(0) = 0}), and
   - a **Curvature Dichotomy Proposition**: f″(0) < 0 ⇒ upper bound h₀ < h_thr;
     f″(0) ≥ 0 ⇒ lower bound only.
-- The bound **Λ ≤ 0.081 is unchanged**: it always used the critical-strip
-  constraint h₀ < ½, not the self-consistency bound.
-- The **structural invariant `h_thr² · S_on = 2`** is unchanged and is exact by
+- The bound **Λ ≤ 0.081** uses the critical-strip constraint h₀ < ½, not the
+  self-consistency bound.
+- The **structural invariant `h_thr² · S_on = 2`** is exact by
   construction (it *defines* h_thr).
 
-**No numerical value changes.** Λ ≤ 0.081, η₂ (two-zero), η = 0.456 (full ODE),
-Cₙ, S_on, the invariant, the Gram diagonals and E/B are all numerically
-identical to before. Only the *interpretation* of `h_thr` changed: it is a
-**definition of the self-consistent depth**, never a universal upper bound on
-off-line zeros.
+**Layer separation.** Λ ≤ 0.081 (Layer A) rests on the two-zero integral η₂ ≈ 0.487
+(rigorous quadrature) and the critical-strip ceiling h₀ < ½; it does not use the
+full-ODE ratio η ≈ 0.46 (Layer B). The self-consistent depth `h_thr` is a
+**definition** (the marginal-stability level set f″(0) = 0), not a universal upper
+bound on off-line zeros.
 
 ---
 
@@ -75,15 +76,16 @@ off-line zeros.
 
 | Script | Verifies | Layer |
 |---|---|---|
-| `verify_invariant.py` | `h_thr² · S_on = 2` to machine precision (exact by definition) | A |
-| `verify_curvature.py` | Hadamard identity f″(0) = S_on + \|∂ₜ²log\|P\|\| − 2/h₀² | A |
-| `verify_lambda.py` | Λ ≤ 0.081 via the two-zero integral at h₀ = ½, Lₙ = L_max = 1.614 | A |
-| `verify_eta2.py` | Two-zero collision ratio η₂ = 0.487 (rigorous quadrature) | A |
-| `verify_eta_full.py` | Full-ODE universal ratio η = 0.456 ± 0.002 over 200 gaps | B |
-| `verify_gram.py` | Gram tensor Gᵢⱼ, diagonals, E(T) = tr G | B |
-| `verify_budget.py` | Poisson budget B(T), ratio E/B → ∞ | B |
-| `verify_speiser.py` | Square-root Speiser depth scaling, C̄ ≈ 1.18 | B |
-| `verify_cn.py` | Cₙ ∈ [1.002, 2.306] across 1999 gaps | B |
+| `verify_01_fundamental_identity.py` | V′(h,t) > 0 across the critical strip | A |
+| `verify_02_curvature_test.py` | Hadamard residual T₃₀(t), tail accounting | A |
+| `verify_03_statistical_balance.py` | Sigma-equivalent of the needed fluctuation | A |
+| `verify_04_inner_function.py` | \|Φ_off\| = 1 on the critical line (machine precision) | A |
+| `verify_05_concavity.py` | Concavity ∂ₜ²log\|ζ\| < 0, one turning point per gap | A |
+| `verify_06_tunneling.py` | Mh₀ = π s/√Cₙ (T-independent); Cₙ ∈ [1.002, 2.306] | B |
+| `verify_07_self_consistency.py` | `h_thr² · S_on = 2` to machine precision (exact by definition) | A |
+| `verify_08_speiser.py` | Square-root Speiser depth scaling, C̄ ≈ 1.18 | B |
+| `verify_09_collision.py` | Full-ODE collision ratio η ≈ 0.46 (CV ≈ 2.7%, weak gap-dependence) | B |
+| `verify_10_energy_budget.py` | Λ ≤ 0.081 (two-zero integral) + Poisson budget B(T), E/B → ∞ | A/B |
 
 ### The Λ ≤ 0.081 computation (Layer A, self-contained)
 
@@ -128,12 +130,11 @@ A cache of the first 2000 ζ-zeros (γ ≤ 2515) is used; regenerate with
 ## Reproducing the tables
 
 ```bash
-python verify_lambda.py      # Layer A: Lambda <= 0.081
-python verify_invariant.py   # Layer A: h_thr^2 * S_on = 2
-python verify_eta2.py        # Layer A: two-zero eta_2 = 0.487
-python verify_eta_full.py    # Layer B: full-ODE eta = 0.456 +/- 0.002
-python verify_gram.py        # Layer B: Gram tensor, E(T)
-python verify_budget.py      # Layer B: E/B -> infinity
+python run_all.py                    # runs all ten verification scripts
+python verify_10_energy_budget.py   # Layer A: Lambda <= 0.081; Layer B: E/B -> infinity
+python verify_07_self_consistency.py # Layer A: h_thr^2 * S_on = 2
+python verify_09_collision.py       # Layer B: full-ODE eta ~ 0.46 (CV ~ 2.7%)
+python verify_06_tunneling.py       # Layer B: Mh0 = pi*s/sqrt(Cn), Cn range
 ```
 
 ---

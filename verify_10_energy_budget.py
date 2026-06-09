@@ -85,23 +85,36 @@ def verify_energy_budget(verbose=True):
         print(f"    {'Budget':>20s}:               B = {B:12.2f}   [log T]")
         print(f"\n    Speiser (h) alone exceeds budget by factor ~{G['IV']/log_h0/B:.0f}")
 
-    # --- Lambda bounds ---
+    # --- Lambda bound (Theorem 17.1 / Corollary, v14) ---
     if verbose:
-        print(f"\nLambda bounds (Theorem 17.1):")
+        print(f"\nLambda bound (Theorem 17.1):")
         Lmax = 1.614
-        # (i) Unconditional
-        eta2 = 0.615
-        h0_unc = Lmax / 2  # Cn >= 1
-        L_unc = eta2 * h0_unc**2 / 2
-        print(f"  (i)   Unconditional: Lambda <= {eta2}*{h0_unc:.3f}^2/2 = {L_unc:.3f}")
-        # (ii) Conditional
-        h0_cond = Lmax / (2 * math.sqrt(6.95))
-        L_cond = h0_cond**2 / 2
-        print(f"  (ii)  Conditional (Cn>=6.95): h0 <= {h0_cond:.3f}, Lambda <= {L_cond:.3f}")
-        # (iii) With eta
-        eta = 0.459
-        L_eta = eta * h0_cond**2 / 2
-        print(f"  (iii) With eta=0.459: Lambda <= {L_eta:.3f}")
+        half_sq = (Lmax / 2.0)**2     # (L_n/2)^2 = 0.651...
+
+        # The UNCONDITIONAL bound uses the critical-strip depth ceiling h0 < 1/2
+        # (NOT the self-consistency depth 0.807), together with the rigorous
+        # two-zero collision integral.  The full backward-flow collision time is
+        # bounded above by this integral via the comparison principle.
+        #   tau_2(h0=1/2, L_n=Lmax) = int_0^{1/2} h(h^2 + (L/2)^2)/((L/2)^2 + 5h^2) dh
+        n = 200000
+        a, b = 0.0, 0.5
+        dx = (b - a) / n
+        def integrand(h):
+            return h * (h**2 + half_sq) / (half_sq + 5.0 * h**2)
+        total = integrand(a) + integrand(b)
+        for i in range(1, n):
+            x = a + i * dx
+            total += (4 if i % 2 else 2) * integrand(x)
+        tau2 = total * dx / 3.0
+        eta2_implied = tau2 / (0.5**2 / 2.0)
+
+        print(f"  Critical-strip depth ceiling (unconditional): h0 < 1/2")
+        print(f"  Max gap at T0=3e12 (Trudgian): L_max = {Lmax}")
+        print(f"  Rigorous two-zero integral at h0=1/2, L_n=L_max:")
+        print(f"    Lambda <= tau_2(1/2, {Lmax}) = {tau2:.4f}  ->  Lambda <= 0.081")
+        print(f"    (implied two-zero ratio eta_2 = {eta2_implied:.4f}; Layer A, rigorous)")
+        print(f"  This does NOT use the self-consistency depth (0.807) and does NOT")
+        print(f"  use the numerical full-ODE eta = 0.459 (Layer B).")
 
     return {"ratios": ratios, "c0": c0}
 

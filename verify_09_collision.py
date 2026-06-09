@@ -1,10 +1,18 @@
 """
-Section 17.9: Collision Time (Theorem 16.1)
-Universal ratio eta = tau_ODE / (h0^2/2) = 0.459 +/- 0.003 (CV = 0.71%).
+Section 17.9: Collision Time (Theorem 16.1) -- FULL-ODE universal ratio.
+
+LAYER B (numerical observation). This computes the FULL backward-flow
+collision-time ratio eta = tau_ODE / (h0^2/2) using all nearby on-line zeros.
+The observed universality eta ~ 0.456-0.459 is a numerical observation.
+
+IMPORTANT: This Layer-B full-ODE eta is DISTINCT from, and NOT used by, the
+unconditional bound Lambda <= 0.081.  That bound (Layer A) uses the rigorous
+TWO-ZERO collision integral (an absolutely convergent quadrature, see
+verify_10_energy_budget.py) together with the critical-strip ceiling h0 < 1/2.
+Do not conflate the two.
 
 The collision time is computed via numerical quadrature:
   tau = integral_0^{h0} h / (1 + 2*h^2 * P_on(h, t0)) dh
-
 where P_on(h, t0) = Sum_j 1/((t0 - gamma_j)^2 + h^2).
 
 Paper: eta is independent of Son, s, T (correlations |r| < 0.02).

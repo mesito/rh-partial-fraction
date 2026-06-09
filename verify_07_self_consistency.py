@@ -1,8 +1,11 @@
 """
-Section 17.7: Self-Consistency Invariant h0^2 * Son = 2
+Section 17.7: Self-Consistent-Depth Invariant h0^2 * Son = 2
 
-This is exact by construction (h0 = sqrt(2/Son)), but verifies that
-the mpmath computation of Son is stable to 14 digits.
+This verifies the structural invariant for the self-consistent depth
+h_thr := sqrt(2/Son).  NOTE: h_thr is a DEFINITION (the level set f''(0)=0,
+the marginal-stability surface), NOT a universal upper bound on off-line
+zeros.  The invariant h_thr^2 * Son = 2 is exact by construction; this script
+verifies that the mpmath computation of Son is stable to 14 digits.
 
 Paper: h0^2 * Son = 2.000000 +/- 1e-14 at all 1999 gaps.
 """

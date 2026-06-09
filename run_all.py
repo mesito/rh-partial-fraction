@@ -2,8 +2,9 @@
 """
 run_all.py -- Master runner for RH Partial-Fraction Numerical Verifications
 
-Paper: "Partial-Fraction Constraints on Hypothetical Off-Line Zeros
-        of the Riemann Zeta Function" -- Version 11
+Paper: "Backward Heat-Flow Collision Dynamics for Zeros of the Riemann
+        xi-Function ... and the Bound Lambda <= 0.081 on the
+        de Bruijn-Newman Constant"
 Author: Mesut Ismail
 
 Usage:
@@ -32,8 +33,8 @@ from verify_10_energy_budget import verify_energy_budget
 
 def run_all(quick=False):
     print("=" * 70)
-    print("  PARTIAL-FRACTION RH CONSTRAINTS: NUMERICAL VERIFICATION")
-    print("  Paper Version 11 -- Mesut Ismail, March 2026")
+    print("  BACKWARD HEAT-FLOW ZERO DYNAMICS: NUMERICAL VERIFICATION")
+    print("  Lambda <= 0.081 on the de Bruijn-Newman constant -- Mesut Ismail")
     print("=" * 70)
 
     print("\nLoading zeta zeros...")

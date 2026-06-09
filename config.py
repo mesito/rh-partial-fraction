@@ -1,7 +1,8 @@
 """
 Shared configuration for RH partial-fraction numerical verifications.
-Paper: "Partial-Fraction Constraints on Hypothetical Off-Line Zeros
-        of the Riemann Zeta Function" -- Version 11
+Paper: "Backward Heat-Flow Collision Dynamics for Zeros of the Riemann
+        xi-Function: A Constraint Metric Tensor, Spectral Tunneling,
+        and the Bound Lambda <= 0.081 on the de Bruijn-Newman Constant"
 Author: Mesut Ismail
 
 All computations use mpmath at 25-digit precision.

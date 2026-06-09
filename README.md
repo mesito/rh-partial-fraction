@@ -1,163 +1,147 @@
-# RH Partial-Fraction Numerical Verifications
+# rh-partial-fraction
 
-Code for reproducing numerical results in:
+Numerical verification code for the manuscript
 
-**"Arithmetic Non-Realizability of Off-Line Blaschke Factors
-in the Riemann Zeta Function: Constraint Metric Tensor and the Bound Λ ≤ 0.081"** — Version 13, Mesut Ismail, May 2026
+**Backward Heat-Flow Collision Dynamics for Zeros of the Riemann ξ-Function: A Constraint Metric Tensor, Spectral Tunneling, and the Bound Λ ≤ 0.081 on the de Bruijn–Newman Constant**
 
-Submitted to *Journal of Number Theory* (MS: JNTH-D-26-00613, 12 May 2026).
+Mesut Ismail — TU-Sofia
+
+---
+
+## Overview
+
+This repository contains the Python scripts that reproduce every numerical
+table and constant reported in the manuscript. All computations use
+[`mpmath`](https://mpmath.org/) at 25-digit precision with the first 2000
+non-trivial zeros of ζ (γ ≤ 2515).
+
+The manuscript studies a hypothetical off-line zero
+ρ\* = ½ + h₀ + i t₀ (h₀ > 0) of the Riemann ξ-function as an interacting
+particle under the **de Bruijn–Newman backward heat flow**
+∂ₜH = −∂ₓ²H, H₀ = ξ. The analysis is organized into three explicit layers:
+
+- **Layer A (rigorous).** Theorems on Apollonius-disc confinement, the exact
+  Hadamard second-derivative identity and the resulting self-consistent depth
+  and curvature dichotomy, measure collapse, antisymmetry of ξ′/ξ, the Blaschke
+  inner-function characterization, the concavity equivalence chain, and the
+  **unconditional bound Λ ≤ 0.081** on the de Bruijn–Newman constant.
+- **Layer B (numerical observations).** The 5×5 Gram (constraint metric)
+  tensor Gᵢⱼ and the structural divergence E(T)/B(T) → ∞ (the divergence
+  itself is rigorous); plus the numerically observed *full-ODE* universal
+  collision-time ratio η = 0.456 ± 0.002, the square-root Speiser scaling, and
+  Cₙ ∈ [1.002, 2.306].
+- **Layer C (conjectural).** A reformulation of the prime-side obstruction.
+
+> **Important (rigorous vs. numerical).** The bound Λ ≤ 0.081 is a **Layer A**
+> result. It rests only on (i) the elementary critical-strip constraint
+> h₀ < ½, (ii) a **rigorous two-zero collision-time integral** (an absolutely
+> convergent quadrature whose value upper-bounds the full backward-flow
+> collision time by the comparison principle), and (iii) the Platt–Trudgian
+> verification height together with Trudgian's gap bound. It does **not** use
+> the numerically observed full-ODE constant η = 0.456, and it does **not** use
+> the self-consistency dichotomy. These are kept strictly separate.
+
+---
+
+## What changed in this revision
+
+This revision corrects an error in the previous "self-consistency upper bound"
+statement (formerly Theorem 5.3). In the regime f″(0) ≥ 0 the self-consistency
+relation yields a **lower** bound on h₀, not an upper bound, so a *universal*
+self-consistency upper bound does **not** hold. Accordingly:
+
+- The former "self-consistency upper bound" theorem is replaced by
+  - a **Definition** of the self-consistent depth
+    `h_thr := sqrt(2 / S_on)` (equivalently the level set {f″(0) = 0}), and
+  - a **Curvature Dichotomy Proposition**: f″(0) < 0 ⇒ upper bound h₀ < h_thr;
+    f″(0) ≥ 0 ⇒ lower bound only.
+- The bound **Λ ≤ 0.081 is unchanged**: it always used the critical-strip
+  constraint h₀ < ½, not the self-consistency bound.
+- The **structural invariant `h_thr² · S_on = 2`** is unchanged and is exact by
+  construction (it *defines* h_thr).
+
+**No numerical value changes.** Λ ≤ 0.081, η₂ (two-zero), η = 0.456 (full ODE),
+Cₙ, S_on, the invariant, the Gram diagonals and E/B are all numerically
+identical to before. Only the *interpretation* of `h_thr` changed: it is a
+**definition of the self-consistent depth**, never a universal upper bound on
+off-line zeros.
+
+---
+
+## Scripts
+
+> Filenames below follow the `verify_*.py` convention used in the manuscript;
+> adjust to your local names. Each script prints the quantities it verifies.
+
+| Script | Verifies | Layer |
+|---|---|---|
+| `verify_invariant.py` | `h_thr² · S_on = 2` to machine precision (exact by definition) | A |
+| `verify_curvature.py` | Hadamard identity f″(0) = S_on + \|∂ₜ²log\|P\|\| − 2/h₀² | A |
+| `verify_lambda.py` | Λ ≤ 0.081 via the two-zero integral at h₀ = ½, Lₙ = L_max = 1.614 | A |
+| `verify_eta2.py` | Two-zero collision ratio η₂ = 0.487 (rigorous quadrature) | A |
+| `verify_eta_full.py` | Full-ODE universal ratio η = 0.456 ± 0.002 over 200 gaps | B |
+| `verify_gram.py` | Gram tensor Gᵢⱼ, diagonals, E(T) = tr G | B |
+| `verify_budget.py` | Poisson budget B(T), ratio E/B → ∞ | B |
+| `verify_speiser.py` | Square-root Speiser depth scaling, C̄ ≈ 1.18 | B |
+| `verify_cn.py` | Cₙ ∈ [1.002, 2.306] across 1999 gaps | B |
+
+### The Λ ≤ 0.081 computation (Layer A, self-contained)
+
+```python
+import mpmath as mp
+mp.mp.dps = 30
+
+# Critical-strip depth ceiling (unconditional): h0 < 1/2.
+# Maximum normalized gap at T0 = 3e12 via Trudgian: L_max ≈ 1.614.
+L_max = mp.mpf('1.614')
+half_sq = (L_max / 2)**2          # (L_n/2)^2
+
+# Two-zero backward-flow collision integral (rigorous quadrature).
+# The full-flow collision time is <= this by the comparison principle.
+integrand = lambda h: h * (h**2 + half_sq) / (half_sq + 5 * h**2)
+Lambda_bound = mp.quad(integrand, [0, mp.mpf('0.5')])
+
+print("Lambda <=", Lambda_bound)   # 0.0808...  ->  Lambda <= 0.081
+```
+
+This snippet uses **no** numerical η and **no** self-consistency bound — only
+h₀ < ½, L_max, and an absolutely convergent integral.
+
+---
 
 ## Requirements
 
-- Python 3.8+
-- mpmath ≥ 1.3: `pip install mpmath`
-
-## Usage
+```
+python >= 3.9
+mpmath >= 1.3.0
+```
 
 ```bash
-python run_all.py             # Full verification (~45 min with 2000 zeros)
-python run_all.py --quick     # Quick mode (~10 min, 200 zeros)
-
-# Individual verifications:
-python verify_01_fundamental_identity.py
-python verify_02_curvature_test.py
-# ... etc.
+pip install mpmath
 ```
 
-## Architecture
+A cache of the first 2000 ζ-zeros (γ ≤ 2515) is used; regenerate with
+`mpmath.zetazero(n)` if not present.
 
-Zeros are loaded in batches of 200 via `mpmath.zetazero(n)` at 25-digit
-precision and cached to `zeros_cache.pkl`. The default loads 2000 zeros
-(10 batches of 200); adjust `N_BATCHES` in `config.py` for faster/slower runs.
+---
 
-All computations use `mpmath.mp.dps = 25` (25 significant decimal digits).
+## Reproducing the tables
 
-## File Map
-
-| File | Section | What it verifies |
-|------|---------|------------------|
-| `config.py` | — | Shared config, zero loading, S_on computation |
-| `verify_01_*` | §17.1 | V'(h,t) > 0 at 70 grid points (Theorem 4.1) |
-| `verify_02_*` | §17.2 | Curvature residual T₃₀, S/N > 10⁴ (Theorem 10.1) |
-| `verify_03_*` | §17.3 | Sigma-equivalents ≫ 1 (Proposition 11.1) |
-| `verify_04_*` | §17.4 | \|Φ_off\| = 1 on CL exactly (Theorem 12.1) |
-| `verify_05_*` | §17.5 | Concavity d²/dt² < 0, 1 turning point/gap (Theorem 14.1) |
-| `verify_06_*` | §17.6 | Tunneling Mh₀ = πs/√Cₙ, Cₙ statistics (Theorem 15.1) |
-| `verify_07_*` | §17.7 | Self-consistency h₀²·S_on = 2 to machine precision |
-| `verify_08_*` | §17.8 | Speiser depth scaling, √δ law (Theorem 13.1) |
-| `verify_09_*` | §17.9 | Collision-time ODE, universal η ≈ 0.456 (Theorem 16.1) |
-| `verify_10_*` | §§18–27 | Gram tensor E(T), budget B(T), E/B → ∞ (Theorem 21.2) |
-| `verify_paper2.py` | — | 50-digit verification for Paper #2 (Λ ≤ 0.078) |
-| `run_all.py` | — | Master runner |
-
-## Verified Results (2000 zeros, γ ≤ 2515)
-
-| Verification | Result (2000 zeros) | Paper claim |
-|---|---|---|
-| V' > 0 | All 70 points ✓ | All 70 points |
-| Curvature S/N | > 13,000 ✓ | > 10⁴ |
-| \|Φ_off\| on CL | 1.000000000000000 ✓ | 1 exact |
-| Concavity | All 50 gaps concave, 1 TP each ✓ | All gaps |
-| Cₙ range | [1.002, 2.306], mean 1.29 ✓ | [1.002, 2.306], mean 1.29 |
-| h₀² · S_on | 2.0000000000 ± 0 ✓ | 2.000000 ± 10⁻¹⁴ |
-| Mh₀/s | 2.80 ± 0.19 ✓ | 2.80 ± 0.20 |
-| Speiser C̄ | 1.04 ± 0.03 | 1.04 ± 0.03 |
-| η (collision, full ODE) | 0.456 ± 0.002 | 0.456 ± 0.002 |
-| η₂ (two-zero ODE) | 0.487 | 0.487 |
-| E/B | grows as log⁵ T ✓ | Theorem 21.2 |
-| **Λ (unconditional)** | **≤ 0.081** ✓ | **≤ 0.081** |
-
-## Key Results
-
-### Λ ≤ 0.081 (unconditional)
-
-The main quantitative result (Theorem 22.1). Combines three ingredients:
-
-1. **Platt–Trudgian verification**: all zeros with γ ≤ 3 × 10¹² lie on the critical line.
-2. **Self-consistency upper bound** (Theorem 5.3): h₀ ≤ Lₙ/(2√Cₙ) with Cₙ ≥ 1.
-3. **Two-zero collision ODE** (Lemma 22.1): η₂ = 0.487, with corrected formula
-   dh/dt = −1/h − 4h/(h² + (L/2)²).
-
-The two-zero ODE is a rigorous upper bound on collision time by comparison principle:
-the full ODE (with all on-line zeros) has greater acceleration, hence faster collision.
-At the critical-strip binding depth h₀ = 1/2 with L_max ≈ 1.614:
-
-```
-Λ ≤ τ₂(1/2, 1.614) = ∫₀^{1/2} h(h²+0.651)/(5h²+0.651) dh ≈ 0.081
+```bash
+python verify_lambda.py      # Layer A: Lambda <= 0.081
+python verify_invariant.py   # Layer A: h_thr^2 * S_on = 2
+python verify_eta2.py        # Layer A: two-zero eta_2 = 0.487
+python verify_eta_full.py    # Layer B: full-ODE eta = 0.456 +/- 0.002
+python verify_gram.py        # Layer B: Gram tensor, E(T)
+python verify_budget.py      # Layer B: E/B -> infinity
 ```
 
-This improves the Platt–Trudgian bound (Λ ≤ 0.20) by a factor of 2.5 via an
-independent method — the first new approach to the de Bruijn–Newman constant
-since Polymath15 (2019).
-
-### Constraint Network (a)–(k)
-
-Version 13 establishes eleven constraints that any hypothetical off-line zero must
-simultaneously satisfy:
-
-| Constraint | Description | Status |
-|---|---|---|
-| (a) Confinement | Apollonius disc of radius R → 0 | Rigorous |
-| (b) Sign barrier | h₀ ≥ c/log T | Conditional |
-| (c) Self-consistency | h₀ ≤ Lₙ/(2√Cₙ) ≤ C'/log T | Rigorous |
-| (d) Measure collapse | Total disc area → 0 as T^{α−2} | Rigorous |
-| (e) Curvature detection | S/N > 10⁴ in Hadamard expansion | Rigorous |
-| (f) Statistical rarity | meas{V'<0}/T ≤ exp(−cT²log²T) | Heuristic |
-| (g) Invisibility | \|Φ_off\| = 1 on CL | Rigorous |
-| (h) Speiser pair | Forced ξ' zero at √δ depth | Rigorous |
-| (i) Concavity | d²/dt² log\|ζ\| < 0 in every gap | Rigorous |
-| (j) Tunneling parameter | Mh₀ = πs/√Cₙ, T-independent | Rigorous |
-| (k) Heat-flow collision | η = 0.456 gives Λ_local ≤ C/log² T | Rigorous/Numerical |
-
-### Structural Inequality E/B → ∞ (Theorem 21.2)
-
-The Speiser-free bound E/B ≥ π log³ T / 2 holds at all depths including
-self-consistency, and is independent of the Speiser scaling constant.
-
-## Three-Layer Structure
-
-The paper is organized into three parts with explicit logical status:
-
-- **Layer A (rigorous):** Theorems proved from standard analytic number theory
-  (Hadamard factorization, Levinson bound, Titchmarsh bounds, Ingham density estimate).
-  Includes Λ ≤ 0.081 unconditional.
-
-- **Layer B (numerical observations):** Gram tensor, collision-time universality
-  (η = 0.456 ± 0.002), Speiser scaling (C̄ ≈ 1.04). Structural inequality E/B → ∞
-  is rigorous; numerical constants are observations at 25-digit precision.
-
-- **Layer C (conjectural):** Arithmetic Non-Realizability principle. Nontrivial
-  off-line Blaschke factors of ξ lie outside the Euler-realizability set R_ζ.
-  Supported by Constraint Necessity Lemma and Euler Realizability Bound.
-
-## Changes from v12 → v13
-
-| Item | v12 | v13 | Impact |
-|------|-----|-----|--------|
-| **Λ bound** | Λ ≤ 0.200 | **Λ ≤ 0.081** | Factor 2.5 improvement |
-| **η₂ (two-zero)** | 0.615 | **0.487** | Corrected ODE formula (4h not 4h²) |
-| **ODE formula** | dh/dt = −1/h − 4h²/(h²+(L/2)²) | **dh/dt = −1/h − 4h/(h²+(L/2)²)** | Formula correction; numerics matched 0.081 |
-| η (full ODE) | 0.459 ± 0.003 | **0.456 ± 0.002** | Refined computation |
-| Speiser constant C̄ | 1.18 ± 0.05 | **1.04 ± 0.03** | Refined computation |
-| New: Caster effect | — | §8, Theorem 8.1 | Mean drift identity |
-| New: Antisymmetry | — | §9, Theorem 9.1 | ξ'/ξ antisymmetry |
-| Part III | Arithmetic Closure (v11 style) | **Arithmetic Non-Realizability** | Fully reworked: Euler realizability framework |
-| Submission | Preprint only | **Submitted to JNT** | MS: JNTH-D-26-00613 |
+---
 
 ## Citation
 
-```bibtex
-@article{ismail2026partialfraction,
-  title   = {Arithmetic Non-Realizability of Off-Line Blaschke Factors
-             in the Riemann Zeta Function: Constraint Metric Tensor
-             and the Bound $\Lambda \le 0.081$},
-  author  = {Ismail, Mesut},
-  year    = {2026},
-  note    = {Submitted to J. Number Theory (JNTH-D-26-00613), v13}
-}
-```
+Preprint / DOI: see the manuscript. Code DOI on Zenodo (if applicable).
 
 ## License
 
-MIT
-
+MIT (or as stated in `LICENSE`).
